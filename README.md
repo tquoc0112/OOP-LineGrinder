@@ -7,15 +7,16 @@ With LineGrinder, you get:
 A clean, simple interface that’s easy to use.
 Customizable board sizes, so you can play short or epic battles.
 A Java-based GUI using Swing for smooth, responsive gameplay.
-Dive in, have fun, and grind those lines to victory! Feel free to fork the repo, explore the code, and put your own spin on it. Have fun!
+Dive in, have fun, and grind those lines to victory! Have fun!
 
 Contributions:
 
 
 A special thanks to my friends for their support and contributions! 🙌
 
--N/A
+-Pham Thai Quoc ITITWE21118
 
+-Pham Thanh Liem ITITIU21069
 
 -N/A
 
