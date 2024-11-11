@@ -20,3 +20,13 @@ A special thanks to my friends for their support and contributions! 🙌
 
 -Nguyen Tram Gia Hung ITITIU23007
 
+
+Works left:
+
+*PTL:
+- Report: First half
+  ( Intro, Outline * discuss first for further made *
+- Import graphics like pictures/drawings of the items to X, O, Images for starting screen and ending screen
+*NTGH:
+- Clockcountdown ( like Chess between each side )
+- Draw the board again make it look better
