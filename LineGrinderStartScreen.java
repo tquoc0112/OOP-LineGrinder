@@ -54,6 +54,7 @@ public class LineGrinderStartScreen extends JFrame {
 
     private void showOptions() {
         HomeMenu.main(new String[]{});// Start the game
+        dispose(); // Close the starting screen
     }
 
     private void showCredits() {
