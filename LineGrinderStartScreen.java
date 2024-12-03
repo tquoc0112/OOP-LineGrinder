@@ -44,6 +44,7 @@ public class LineGrinderStartScreen extends JFrame {
             frame.setTitle("LineGrinder");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+            HomeMenu.main(new String[]{});// Start the game
             LineGrinderPanel panel = new LineGrinderPanel(19); // Default grid size
             frame.add(panel);
 
@@ -52,7 +53,8 @@ public class LineGrinderStartScreen extends JFrame {
     }
 
     private void showOptions() {
-        JOptionPane.showMessageDialog(this, "Options will be implemented soon!", "Options", JOptionPane.INFORMATION_MESSAGE);
+        HomeMenu.main(new String[]{});// Start the game
+        dispose(); // Close the starting screen
     }
 
     private void showCredits() {
