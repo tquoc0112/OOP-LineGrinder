@@ -19,6 +19,7 @@ public class LineGrinderStartScreen extends JFrame {
         JButton startButton = new JButton("Start");
         JButton optionButton = new JButton("Options");
         JButton creditsButton = new JButton("Credits");
+        
 
         buttonPanel.add(startButton);
         buttonPanel.add(optionButton);

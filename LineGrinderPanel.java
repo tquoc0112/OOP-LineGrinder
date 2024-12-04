@@ -116,8 +116,8 @@ class LineGrinderPanel extends JPanel {
             double pieceDiameter = PIECE_FRAC * squareWidth;
             double xLeft = (panelWidth - boardWidth) / 2 + MARGIN;
             double yTop = (panelHeight - boardWidth) / 2 + MARGIN;
-            int col = (int) Math.round((e.getX() - xLeft) / squareWidth - 0.5);
-            int row = (int) Math.round((e.getY() - yTop) / squareWidth - 0.5);
+            int col = (int) Math.round((e.getX() - xLeft) / squareWidth );
+            int row = (int) Math.round((e.getY() - yTop) / squareWidth );
             if (row >= 0 && row < size && col >= 0 && col < size
                 && state.getPiece(row, col) == LineGrinderState.NONE
                 && state.getWinner() == LineGrinderState.NONE) {
