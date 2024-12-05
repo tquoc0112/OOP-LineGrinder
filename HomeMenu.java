@@ -66,11 +66,14 @@ public class HomeMenu extends JFrame {
         avatarDialog.setLocationRelativeTo(parentFrame);  
     
         // Load the avatar images  
-        String[] avatarPaths = {"GOMOKU_Logo.png", "avatar2.png", "avatar3.png", "avatar4.png"};  
+        String[] avatarPaths = {"avatar1.png", "avatar2.png", "avatar3.png", "avatar4.png"};  
         ImageIcon[] avatarIcons = new ImageIcon[4];  
     
         for (int i = 0; i < avatarPaths.length; i++) {  
-            avatarIcons[i] = new ImageIcon(HomeMenu.class.getResource(avatarPaths[i]));  
+            ImageIcon originalIcon = new ImageIcon(HomeMenu.class.getResource(avatarPaths[i]));  
+            Image originalImage = originalIcon.getImage();  
+            Image resizedImage = originalImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);  
+            avatarIcons[i] = new ImageIcon(resizedImage);   
         }  
     
         // Create the avatar buttons  
