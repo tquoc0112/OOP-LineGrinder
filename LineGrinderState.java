@@ -1,9 +1,4 @@
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import javax.swing.*;
-
-class LineGrinderState {
+public class LineGrinderState {
     public static final int NONE = 0;
     public static final int X = 1;
     public static final int O = 2;
@@ -15,7 +10,7 @@ class LineGrinderState {
     public LineGrinderState(int size) {
         this.size = size;
         board = new int[size][size];
-        currentPlayer = X;
+        currentPlayer = X; // X starts the game
     }
 
     public int getPiece(int row, int col) {
@@ -25,26 +20,25 @@ class LineGrinderState {
     public void playPiece(int row, int col) {
         if (board[row][col] == NONE) {
             board[row][col] = currentPlayer;
-            currentPlayer = (currentPlayer == X) ? O : X;
+            currentPlayer = (currentPlayer == X) ? O : X; // Switch player after each move
         }
     }
 
     public int getWinner() {
-        // Logic for determining the winner (checking rows, columns, and diagonals)
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
                 int piece = getPiece(row, col);
                 if (piece != NONE) {
-                    if (checkDirection(row, col, 1, 0, piece) || // Check horizontally
-                            checkDirection(row, col, 0, 1, piece) || // Check vertically
-                            checkDirection(row, col, 1, 1, piece) || // Check diagonal down-right
-                            checkDirection(row, col, 1, -1, piece)) { // Check diagonal down-left
+                    if (checkDirection(row, col, 1, 0, piece) ||  // Check horizontally
+                        checkDirection(row, col, 0, 1, piece) ||  // Check vertically
+                        checkDirection(row, col, 1, 1, piece) ||  // Check diagonal down-right
+                        checkDirection(row, col, 1, -1, piece)) { // Check diagonal down-left
                         return piece;
                     }
                 }
             }
         }
-        return NONE;
+        return NONE; // No winner yet
     }
 
     private boolean checkDirection(int row, int col, int rowDir, int colDir, int piece) {
@@ -53,13 +47,13 @@ class LineGrinderState {
             int newRow = row + i * rowDir;
             int newCol = col + i * colDir;
             if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size
-                    && getPiece(newRow, newCol) == piece) {
+                && getPiece(newRow, newCol) == piece) {
                 count++;
             } else {
                 break;
             }
         }
-        return count == 5;
+        return count == 5; // A valid line has 5 consecutive pieces
     }
 
     public int getCurrentPlayer() {
