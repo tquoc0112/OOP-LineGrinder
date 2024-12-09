@@ -58,6 +58,48 @@ public class HomeMenu extends JFrame {
         frame.setVisible(true);
     }
 
+    private static void showAvatarSelectionDialog(JFrame parentFrame, JTextField nameField, JButton avatarButton) {  
+        // Create a new JDialog for avatar selection  
+        JDialog avatarDialog = new JDialog(parentFrame, "Select Avatar", true);  
+        avatarDialog.setSize(500, 400);  
+        avatarDialog.setLayout(new GridLayout(2, 2, 10, 10));  
+        avatarDialog.setLocationRelativeTo(parentFrame);  
+    
+        // Load the avatar images  
+        String[] avatarPaths = {"avatar1.png", "avatar2.png", "avatar3.png", "avatar4.png"};  
+        ImageIcon[] avatarIcons = new ImageIcon[4];  
+    
+        for (int i = 0; i < avatarPaths.length; i++) {  
+            ImageIcon originalIcon = new ImageIcon(HomeMenu.class.getResource(avatarPaths[i]));  
+            Image originalImage = originalIcon.getImage();  
+            Image resizedImage = originalImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);  
+            avatarIcons[i] = new ImageIcon(resizedImage);   
+        }  
+    
+        // Create the avatar buttons  
+        JButton[] avatarButtons = new JButton[4];  
+        for (int i = 0; i < avatarButtons.length; i++) {  
+            avatarButtons[i] = new JButton(avatarIcons[i]);  
+        }  
+    
+        // Add action listeners to the avatar buttons  
+        for (int i = 0; i < avatarButtons.length; i++) {  
+            int finalI = i;  
+            avatarButtons[i].addActionListener(e -> {  
+                avatarButton.setIcon(avatarIcons[finalI]);  
+                avatarDialog.dispose();  
+            });  
+        }  
+    
+        // Add the avatar buttons to the dialog  
+        for (JButton button : avatarButtons) {  
+            avatarDialog.add(button);  
+        }  
+    
+        // Make the dialog visible  
+        avatarDialog.setVisible(true);  
+    }
+
     /**
      * Show the dialog for player selection.
      */
@@ -69,7 +111,7 @@ public class HomeMenu extends JFrame {
         dialog.setLocationRelativeTo(parentFrame);
     
         // Title Location
-        JLabel titleLabel = new JLabel("Enter Players' Names");
+        JLabel titleLabel = new JLabel("Enter Players and Select Avatars");
         titleLabel.setFont(new Font("Algerian", Font.BOLD, 20));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         dialog.add(titleLabel, BorderLayout.NORTH);
@@ -91,12 +133,28 @@ public class HomeMenu extends JFrame {
         JTextField player2NameField = new JTextField();
         player2NameField.setFont(new Font("Algerian", Font.PLAIN, 18));
     
+        // Avatar selection buttons  
+        JButton player1AvatarButton = new JButton("Select Avatar");  
+        player1AvatarButton.setFont(new Font("Algerian", Font.BOLD, 16));  
+        JButton player2AvatarButton = new JButton("Select Avatar");  
+        player2AvatarButton.setFont(new Font("Algerian", Font.BOLD, 16));  
+    
+        // Add action listeners to the "Select Avatar" buttons  
+        player1AvatarButton.addActionListener(e -> {  
+            showAvatarSelectionDialog (parentFrame, player1NameField, player1AvatarButton);  
+        });  
+        player2AvatarButton.addActionListener(e -> {  
+            showAvatarSelectionDialog(parentFrame, player2NameField, player2AvatarButton);  
+        });
+        
         // Add components to the input panel
         inputPanel.add(player1Label);
         inputPanel.add(player1NameField);
+        inputPanel.add(player1AvatarButton); 
         inputPanel.add(player2Label);
-        inputPanel.add(player2NameField);
-    
+        inputPanel.add(player2NameField); 
+        inputPanel.add(player2AvatarButton);
+
         // Add input panel to the dialog
         dialog.add(inputPanel, BorderLayout.CENTER);
     
