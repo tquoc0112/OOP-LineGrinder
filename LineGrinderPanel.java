@@ -143,10 +143,9 @@ class LineGrinderPanel extends JPanel {
             for (int row = 0; row < size; row++) {
                 for (int col = 0; col < size; col++) {
                     int piece = state.getPiece(row, col);
-        
-                    double xCenter = (getWidth() - boardWidth) / 2 + col * squareWidth + squareWidth / 2;
-                    double yCenter = (getHeight() - boardWidth) / 2 + row * squareWidth + squareWidth / 2;
-        
+                    double xCenter = xLeft + col * squareWidth + (squareWidth / 2) ;
+                    double yCenter = yTop + row * squareWidth + (squareWidth / 2)  ;
+
                     if (piece == LineGrinderState.X) {
                         g2.setColor(Color.BLACK);
                         g2.fill(new Ellipse2D.Double(xCenter - pieceDiameter / 2, yCenter - pieceDiameter / 2, pieceDiameter, pieceDiameter));
@@ -167,10 +166,8 @@ class LineGrinderPanel extends JPanel {
             double squareWidth = boardWidth / size;
             double xLeft = (panelWidth - boardWidth) / 2 + MARGIN;
             double yTop = (panelHeight - boardWidth) / 2 + MARGIN;
-
-            int col = (int) Math.round((e.getX() - xLeft) / squareWidth);
-            int row = (int) Math.round((e.getY() - yTop) / squareWidth);
-
+            int col = (int) Math.round((e.getX() - xLeft) / squareWidth - 0.5);
+            int row = (int) Math.round((e.getY() - yTop) / squareWidth - 0.5);
             if (row >= 0 && row < size && col >= 0 && col < size
                 && state.getPiece(row, col) == LineGrinderState.NONE
                 && state.getWinner() == LineGrinderState.NONE) {
