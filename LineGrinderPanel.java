@@ -18,28 +18,29 @@ class LineGrinderPanel extends JPanel {
         this(19, "square");
     }
 
-    public LineGrinderPanel(int size) {
+    public LineGrinderPanel(int size, String mapType) {
         super(new BorderLayout());
         this.size = size;
+        this.mapType = mapType;
         state = new LineGrinderState(size);
-    
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-    
+
         restartButton = new JButton("Restart");
         mainMenuButton = new JButton("Main Menu");
-    
+
         restartButton.addActionListener(e -> restartGame());
         mainMenuButton.addActionListener(e -> returnToMainMenu());
-    
+
         buttonPanel.add(restartButton);
         buttonPanel.add(mainMenuButton);
-    
+
         this.add(buttonPanel, BorderLayout.SOUTH);
-    
+
         BoardPanel boardPanel = new BoardPanel();
         this.add(boardPanel, BorderLayout.CENTER);
-    }    
+    }
 
     private void restartGame() {
         state = new LineGrinderState(size);
@@ -63,7 +64,7 @@ class LineGrinderPanel extends JPanel {
 
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_ON);
+                    RenderingHints.VALUE_ANTIALIAS_ON);
 
             double panelWidth = getWidth();
             double panelHeight = getHeight();
@@ -107,7 +108,8 @@ class LineGrinderPanel extends JPanel {
 
             for (int i = 1; i < size; i++) {
                 double ringRadius = i * radius / size;
-                g2.draw(new Ellipse2D.Double(centerX - ringRadius, centerY - ringRadius, 2 * ringRadius, 2 * ringRadius));
+                g2.draw(new Ellipse2D.Double(centerX - ringRadius, centerY - ringRadius, 2 * ringRadius,
+                        2 * ringRadius));
             }
         }
 
@@ -139,23 +141,27 @@ class LineGrinderPanel extends JPanel {
         private void drawPieces(Graphics2D g2, double boardWidth) {
             double squareWidth = boardWidth / size;
             double pieceDiameter = PIECE_FRAC * squareWidth;
-        
+            double xLeft = (getWidth() - boardWidth) / 2 + MARGIN;
+            double yTop = (getHeight() - boardWidth) / 2 + MARGIN;
+
             for (int row = 0; row < size; row++) {
                 for (int col = 0; col < size; col++) {
                     int piece = state.getPiece(row, col);
-                    double xCenter = xLeft + col * squareWidth + (squareWidth / 2) ;
-                    double yCenter = yTop + row * squareWidth + (squareWidth / 2)  ;
+                    double xCenter = xLeft + col * squareWidth + (squareWidth / 2);
+                    double yCenter = yTop + row * squareWidth + (squareWidth / 2);
 
                     if (piece == LineGrinderState.X) {
                         g2.setColor(Color.BLACK);
-                        g2.fill(new Ellipse2D.Double(xCenter - pieceDiameter / 2, yCenter - pieceDiameter / 2, pieceDiameter, pieceDiameter));
+                        g2.fill(new Ellipse2D.Double(xCenter - pieceDiameter / 2, yCenter - pieceDiameter / 2,
+                                pieceDiameter, pieceDiameter));
                     } else if (piece == LineGrinderState.O) {
                         g2.setColor(Color.RED);
-                        g2.fill(new Ellipse2D.Double(xCenter - pieceDiameter / 2, yCenter - pieceDiameter / 2, pieceDiameter, pieceDiameter));
+                        g2.fill(new Ellipse2D.Double(xCenter - pieceDiameter / 2, yCenter - pieceDiameter / 2,
+                                pieceDiameter, pieceDiameter));
                     }
                 }
             }
-        }        
+        }
     }
 
     class LineGrinderListener extends MouseAdapter {
@@ -169,14 +175,14 @@ class LineGrinderPanel extends JPanel {
             int col = (int) Math.round((e.getX() - xLeft) / squareWidth - 0.5);
             int row = (int) Math.round((e.getY() - yTop) / squareWidth - 0.5);
             if (row >= 0 && row < size && col >= 0 && col < size
-                && state.getPiece(row, col) == LineGrinderState.NONE
-                && state.getWinner() == LineGrinderState.NONE) {
+                    && state.getPiece(row, col) == LineGrinderState.NONE
+                    && state.getWinner() == LineGrinderState.NONE) {
                 state.playPiece(row, col);
                 repaint();
                 int winner = state.getWinner();
                 if (winner != LineGrinderState.NONE)
                     JOptionPane.showMessageDialog(null,
-                        (winner == LineGrinderState.X) ? "X wins!" : "O wins!");
+                            (winner == LineGrinderState.X) ? "X wins!" : "O wins!");
             }
         }
     }
