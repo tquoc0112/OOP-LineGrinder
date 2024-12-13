@@ -54,8 +54,11 @@ class LineGrinderPanel extends JPanel {
     }
 
     private class BoardPanel extends JPanel {
+        private Image backgroundImage;
+
         public BoardPanel() {
             addMouseListener(new LineGrinderListener());
+            backgroundImage = new ImageIcon(getClass().getResource("background.jpg")).getImage();
         }
 
         @Override
@@ -70,9 +73,10 @@ class LineGrinderPanel extends JPanel {
             double panelHeight = getHeight();
             double boardWidth = Math.min(panelWidth, panelHeight) - 2 * MARGIN;
 
-            // Background color
-            g2.setColor(new Color(0.925f, 0.670f, 0.34f));
-            g2.fill(new Rectangle2D.Double(0, 0, panelWidth, panelHeight));
+            if (backgroundImage != null) {
+                g2.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+    
 
             if (mapType.equals("square")) {
                 drawSquareBoard(g2, boardWidth);
