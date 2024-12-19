@@ -14,9 +14,8 @@ class LineGrinderPanel extends JPanel {
 
     private String mapType = "square"; // Default map type
 
-    // Added constructor for compatibility
-    public LineGrinderPanel(int size) {
-        this(size, "square");
+    public LineGrinderPanel() {
+        this(19, "square");
     }
 
     public LineGrinderPanel(int size, String mapType) {
