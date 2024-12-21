@@ -13,8 +13,8 @@ public class LineGrinderPanel extends JPanel {
     private int player1Time;
     private int player2Time;
 
-    private JLabel timerLabel1;
-    private JLabel timerLabel2;
+    private JLabel player1TimerLabel;
+    private JLabel player2TimerLabel;
 
     private Timer player1Timer;
     private Timer player2Timer;
@@ -42,25 +42,66 @@ public class LineGrinderPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
-        // Timer Panel
-        JPanel timerPanel = new JPanel(new GridLayout(1, 2));
-        timerLabel1 = new JLabel(player1Name + ": " + formatTime(player1Time), SwingConstants.CENTER);
-        timerLabel2 = new JLabel(player2Name + ": " + formatTime(player2Time), SwingConstants.CENTER);
-        timerPanel.add(timerLabel1);
-        timerPanel.add(timerLabel2);
+        // Left Panel for Player 1
+        JPanel player1Panel = createPlayerPanel(player1Name, player1Avatar, true);
 
-        add(timerPanel, BorderLayout.NORTH);
+        // Right Panel for Player 2
+        JPanel player2Panel = createPlayerPanel(player2Name, player2Avatar, false);
 
-        // Add mouse listener for placing pieces
-        addMouseListener(new MouseAdapter() {
+        // Add player panels
+        add(player1Panel, BorderLayout.WEST);
+        add(player2Panel, BorderLayout.EAST);
+
+        // Board Panel
+        JPanel boardPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                drawBoard(g);
+            }
+        };
+        boardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 handleMouseClick(e.getX(), e.getY());
             }
         });
+        add(boardPanel, BorderLayout.CENTER);
 
         // Initialize timers
         startTimers();
+    }
+
+    private JPanel createPlayerPanel(String playerName, ImageIcon playerAvatar, boolean isPlayer1) {
+        JPanel playerPanel = new JPanel();
+        playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
+        playerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel nameLabel = new JLabel(playerName);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JLabel avatarLabel = new JLabel();
+        avatarLabel.setIcon(new ImageIcon(playerAvatar.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+        avatarLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JLabel timerLabel = new JLabel(formatTime(isPlayer1 ? player1Time : player2Time));
+        timerLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        if (isPlayer1) {
+            player1TimerLabel = timerLabel;
+        } else {
+            player2TimerLabel = timerLabel;
+        }
+
+        playerPanel.add(nameLabel);
+        playerPanel.add(Box.createVerticalStrut(10)); // Spacer
+        playerPanel.add(avatarLabel);
+        playerPanel.add(Box.createVerticalStrut(10)); // Spacer
+        playerPanel.add(timerLabel);
+
+        return playerPanel;
     }
 
     private void handleMouseClick(int x, int y) {
@@ -135,7 +176,7 @@ public class LineGrinderPanel extends JPanel {
             public void run() {
                 if (isPlayer1Turn) {
                     player1Time--;
-                    timerLabel1.setText(player1Name + ": " + formatTime(player1Time));
+                    player1TimerLabel.setText(formatTime(player1Time));
                     if (player1Time <= 0) {
                         endGame(player2Name + " wins! Player 1 ran out of time.");
                     }
@@ -148,7 +189,7 @@ public class LineGrinderPanel extends JPanel {
             public void run() {
                 if (!isPlayer1Turn) {
                     player2Time--;
-                    timerLabel2.setText(player2Name + ": " + formatTime(player2Time));
+                    player2TimerLabel.setText(formatTime(player2Time));
                     if (player2Time <= 0) {
                         endGame(player1Name + " wins! Player 2 ran out of time.");
                     }
@@ -172,13 +213,12 @@ public class LineGrinderPanel extends JPanel {
     }
 
     private void restartGame() {
-        // Reset the game board and timers
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 board[i][j] = 0;
             }
         }
-        player1Time = 300; // Example reset timer values
+        player1Time = 300; // Reset timer
         player2Time = 300;
         isPlayer1Turn = true;
         repaint();
@@ -197,9 +237,7 @@ public class LineGrinderPanel extends JPanel {
         return String.format("%02d:%02d", minutes, secs);
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    private void drawBoard(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
 
         double cellSize = getWidth() / (double) boardSize;
