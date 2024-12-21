@@ -39,9 +39,9 @@ public class HomeMenu extends JFrame {
             String rules = "<html><h2>Gomoku Rules</h2>"
                     + "<ol>"
                     + "<li>Players alternate turns placing X and O on the board.</li>"
-                    + "<li>The first player to align 5 in a row (horizontally, vertically, or diagonally) wins.</li>"
+                    + "<li>The first player to align the required number of pieces in a row (horizontally, vertically, or diagonally) wins.</li>"
                     + "<li>No moves can be placed on an occupied position.</li>"
-                    + "<li>The game is a draw if the board is full and no player has 5 in a row.</li>"
+                    + "<li>The game is a draw if the board is full and no player has the required alignment.</li>"
                     + "</ol></html>";
             JOptionPane.showMessageDialog(frame, rules, "How to Play", JOptionPane.INFORMATION_MESSAGE);
         });
@@ -68,7 +68,7 @@ public class HomeMenu extends JFrame {
     private static void showPlayerSelectionDialog() {
         JFrame selectionFrame = new JFrame("Player Selection");
         selectionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        selectionFrame.setSize(600, 600);
+        selectionFrame.setSize(600, 700);
         selectionFrame.setLocationRelativeTo(null); // Center the frame
         selectionFrame.setLayout(new BorderLayout());
 
@@ -147,6 +147,15 @@ public class HomeMenu extends JFrame {
         boardSizePanel.add(boardSizeField);
         boardSizePanel.add(incrementButton);
 
+        // Winning Condition Panel
+        JPanel winningConditionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JLabel winningConditionLabel = new JLabel("Winning Condition:");
+        winningConditionLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        JComboBox<Integer> winningConditionComboBox = new JComboBox<>(new Integer[] { 3, 4, 5, 6, 7 });
+        winningConditionComboBox.setSelectedItem(5); // Default value
+        winningConditionPanel.add(winningConditionLabel);
+        winningConditionPanel.add(winningConditionComboBox);
+
         // Add Panels to Input Panel
         inputPanel.add(player1Panel);
         inputPanel.add(player1TimerPanel);
@@ -155,6 +164,8 @@ public class HomeMenu extends JFrame {
         inputPanel.add(player2TimerPanel);
         inputPanel.add(Box.createVerticalStrut(15));
         inputPanel.add(boardSizePanel);
+        inputPanel.add(Box.createVerticalStrut(15));
+        inputPanel.add(winningConditionPanel);
 
         selectionFrame.add(inputPanel, BorderLayout.CENTER);
 
@@ -164,6 +175,7 @@ public class HomeMenu extends JFrame {
             String player1Name = player1NameField.getText().trim();
             String player2Name = player2NameField.getText().trim();
             int boardSize = Integer.parseInt(boardSizeField.getText());
+            int winningCondition = (int) winningConditionComboBox.getSelectedItem();
             String player1Timer = (String) player1TimerComboBox.getSelectedItem();
             String player2Timer = (String) player2TimerComboBox.getSelectedItem();
 
@@ -174,7 +186,8 @@ public class HomeMenu extends JFrame {
                 ImageIcon player1Avatar = (ImageIcon) player1AvatarButton.getIcon();
                 ImageIcon player2Avatar = (ImageIcon) player2AvatarButton.getIcon();
                 selectionFrame.dispose();
-                LineGrinder.startGame(boardSize, player1Avatar, player2Avatar, player1Timer, player2Timer);
+                LineGrinder.startGame(boardSize, winningCondition, player1Avatar, player2Avatar, player1Timer,
+                        player2Timer);
             }
         });
 

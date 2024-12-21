@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 public class LineGrinderPanel extends JPanel {
     private int boardSize;
+    private int winningCondition; // Winning condition
     private ImageIcon player1Avatar;
     private ImageIcon player2Avatar;
     private int player1Time;
@@ -26,16 +27,18 @@ public class LineGrinderPanel extends JPanel {
     private String player1Name = "Player 1"; // Placeholder names, can be replaced
     private String player2Name = "Player 2";
 
-    public LineGrinderPanel(int boardSize, ImageIcon player1Avatar, ImageIcon player2Avatar, int player1Time,
+    public LineGrinderPanel(int boardSize, int winningCondition, ImageIcon player1Avatar, ImageIcon player2Avatar,
+            int player1Time,
             int player2Time) {
         this.boardSize = boardSize;
+        this.winningCondition = winningCondition;
         this.player1Avatar = player1Avatar;
         this.player2Avatar = player2Avatar;
         this.player1Time = player1Time;
         this.player2Time = player2Time;
 
         this.board = new int[boardSize][boardSize]; // Initialize the board
-        this.winningCoordinates = new int[5][2]; // For a maximum of 5 winning pieces
+        this.winningCoordinates = new int[winningCondition][2]; // Adjust size based on winning condition
 
         setLayout(new BorderLayout());
 
@@ -103,18 +106,18 @@ public class LineGrinderPanel extends JPanel {
 
     private boolean checkDirection(int row, int col, int rowDir, int colDir, int player) {
         int count = 0;
-        for (int i = -4; i <= 4; i++) { // Check in both directions
+        for (int i = -winningCondition + 1; i < winningCondition; i++) { // Check in both directions
             int newRow = row + i * rowDir;
             int newCol = col + i * colDir;
             if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize
                     && board[newRow][newCol] == player) {
-                if (count < 5) {
+                if (count < winningCondition) {
                     winningCoordinates[count][0] = newRow;
                     winningCoordinates[count][1] = newCol;
                 }
                 count++;
-                if (count == 5) {
-                    return true; // Found 5 in a row
+                if (count == winningCondition) {
+                    return true; // Found the required line
                 }
             } else {
                 count = 0; // Reset count if the sequence breaks
