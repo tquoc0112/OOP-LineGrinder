@@ -187,7 +187,7 @@ public class HomeMenu extends JFrame {
                 ImageIcon player2Avatar = (ImageIcon) player2AvatarButton.getIcon();
                 selectionFrame.dispose();
                 LineGrinder.startGame(boardSize, winningCondition, player1Avatar, player2Avatar, player1Timer,
-                        player2Timer);
+                        player2Timer, player1Name, player2Name);
             }
         });
 

@@ -3,8 +3,7 @@ import javax.swing.*;
 public class LineGrinder {
 
     public static void startGame(int boardSize, int winningCondition, ImageIcon player1Avatar, ImageIcon player2Avatar,
-            String player1Timer,
-            String player2Timer) {
+            String player1Timer, String player2Timer, String player1Name, String player2Name) {
         // Parse timer values (convert to seconds if needed)
         int player1Time = parseTimer(player1Timer);
         int player2Time = parseTimer(player2Timer);
@@ -15,10 +14,10 @@ public class LineGrinder {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        // Initialize LineGrinderPanel with timer values and winning condition
+        // Initialize LineGrinderPanel with timer values, winning condition, and player
+        // names
         LineGrinderPanel panel = new LineGrinderPanel(boardSize, winningCondition, player1Avatar, player2Avatar,
-                player1Time,
-                player2Time);
+                player1Time, player2Time, player1Name, player2Name);
         frame.add(panel);
 
         // Display the frame

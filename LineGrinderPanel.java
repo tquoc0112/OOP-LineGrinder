@@ -24,18 +24,19 @@ public class LineGrinderPanel extends JPanel {
     private int[][] board;
     private int[][] winningCoordinates; // To store winning line coordinates
 
-    private String player1Name = "Player 1"; // Placeholder names, can be replaced
-    private String player2Name = "Player 2";
+    private String player1Name; // Player 1 name
+    private String player2Name; // Player 2 name
 
     public LineGrinderPanel(int boardSize, int winningCondition, ImageIcon player1Avatar, ImageIcon player2Avatar,
-            int player1Time,
-            int player2Time) {
+            int player1Time, int player2Time, String player1Name, String player2Name) {
         this.boardSize = boardSize;
         this.winningCondition = winningCondition;
         this.player1Avatar = player1Avatar;
         this.player2Avatar = player2Avatar;
         this.player1Time = player1Time;
         this.player2Time = player2Time;
+        this.player1Name = player1Name; // Set Player 1 name
+        this.player2Name = player2Name; // Set Player 2 name
 
         this.board = new int[boardSize][boardSize]; // Initialize the board
         this.winningCoordinates = new int[winningCondition][2]; // Adjust size based on winning condition
@@ -77,7 +78,7 @@ public class LineGrinderPanel extends JPanel {
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
         playerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel nameLabel = new JLabel(playerName);
+        JLabel nameLabel = new JLabel(playerName); // Show the actual player name
         nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
