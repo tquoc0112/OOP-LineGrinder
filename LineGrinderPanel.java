@@ -21,6 +21,10 @@ public class LineGrinderPanel extends JPanel {
     private boolean isPlayer1Turn = true;
 
     private int[][] board;
+    private int[][] winningCoordinates; // To store winning line coordinates
+
+    private String player1Name = "Player 1"; // Placeholder names, can be replaced
+    private String player2Name = "Player 2";
 
     public LineGrinderPanel(int boardSize, ImageIcon player1Avatar, ImageIcon player2Avatar, int player1Time,
             int player2Time) {
@@ -31,13 +35,14 @@ public class LineGrinderPanel extends JPanel {
         this.player2Time = player2Time;
 
         this.board = new int[boardSize][boardSize]; // Initialize the board
+        this.winningCoordinates = new int[5][2]; // For a maximum of 5 winning pieces
 
         setLayout(new BorderLayout());
 
         // Timer Panel
         JPanel timerPanel = new JPanel(new GridLayout(1, 2));
-        timerLabel1 = new JLabel("Player 1: " + formatTime(player1Time), SwingConstants.CENTER);
-        timerLabel2 = new JLabel("Player 2: " + formatTime(player2Time), SwingConstants.CENTER);
+        timerLabel1 = new JLabel(player1Name + ": " + formatTime(player1Time), SwingConstants.CENTER);
+        timerLabel2 = new JLabel(player2Name + ": " + formatTime(player2Time), SwingConstants.CENTER);
         timerPanel.add(timerLabel1);
         timerPanel.add(timerLabel2);
 
@@ -62,9 +67,60 @@ public class LineGrinderPanel extends JPanel {
 
         if (row >= 0 && row < boardSize && col >= 0 && col < boardSize && board[row][col] == 0) {
             board[row][col] = isPlayer1Turn ? 1 : 2;
+
+            // Reset winning coordinates before checking
+            for (int i = 0; i < winningCoordinates.length; i++) {
+                winningCoordinates[i][0] = -1;
+                winningCoordinates[i][1] = -1;
+            }
+
+            // Check for a winner after placing a piece
+            if (checkWinner(row, col)) {
+                repaint(); // Ensure all changes are visible
+                Timer endGameDelay = new Timer();
+                endGameDelay.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        String winnerName = isPlayer1Turn ? player1Name : player2Name;
+                        endGame(winnerName + " wins!");
+                    }
+                }, 500); // 500ms delay to show the last move
+                return;
+            }
+
             isPlayer1Turn = !isPlayer1Turn; // Switch turns
             repaint();
         }
+    }
+
+    private boolean checkWinner(int row, int col) {
+        int player = board[row][col];
+        return checkDirection(row, col, 1, 0, player) || // Check horizontally
+                checkDirection(row, col, 0, 1, player) || // Check vertically
+                checkDirection(row, col, 1, 1, player) || // Check diagonal down-right
+                checkDirection(row, col, 1, -1, player); // Check diagonal down-left
+    }
+
+    private boolean checkDirection(int row, int col, int rowDir, int colDir, int player) {
+        int count = 0;
+        for (int i = -4; i <= 4; i++) { // Check in both directions
+            int newRow = row + i * rowDir;
+            int newCol = col + i * colDir;
+            if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize
+                    && board[newRow][newCol] == player) {
+                if (count < 5) {
+                    winningCoordinates[count][0] = newRow;
+                    winningCoordinates[count][1] = newCol;
+                }
+                count++;
+                if (count == 5) {
+                    return true; // Found 5 in a row
+                }
+            } else {
+                count = 0; // Reset count if the sequence breaks
+            }
+        }
+        return false;
     }
 
     private void startTimers() {
@@ -76,9 +132,9 @@ public class LineGrinderPanel extends JPanel {
             public void run() {
                 if (isPlayer1Turn) {
                     player1Time--;
-                    timerLabel1.setText("Player 1: " + formatTime(player1Time));
+                    timerLabel1.setText(player1Name + ": " + formatTime(player1Time));
                     if (player1Time <= 0) {
-                        endGame("Player 2 Wins! Player 1 ran out of time.");
+                        endGame(player2Name + " wins! Player 1 ran out of time.");
                     }
                 }
             }
@@ -89,9 +145,9 @@ public class LineGrinderPanel extends JPanel {
             public void run() {
                 if (!isPlayer1Turn) {
                     player2Time--;
-                    timerLabel2.setText("Player 2: " + formatTime(player2Time));
+                    timerLabel2.setText(player2Name + ": " + formatTime(player2Time));
                     if (player2Time <= 0) {
-                        endGame("Player 1 Wins! Player 2 ran out of time.");
+                        endGame(player1Name + " wins! Player 2 ran out of time.");
                     }
                 }
             }
@@ -101,7 +157,35 @@ public class LineGrinderPanel extends JPanel {
     private void endGame(String message) {
         player1Timer.cancel();
         player2Timer.cancel();
-        JOptionPane.showMessageDialog(this, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
+        int choice = JOptionPane.showOptionDialog(this, message, "Game Over",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+                new String[] { "Restart", "Main Menu" }, "Restart");
+
+        if (choice == 0) {
+            restartGame();
+        } else {
+            backToMainMenu();
+        }
+    }
+
+    private void restartGame() {
+        // Reset the game board and timers
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                board[i][j] = 0;
+            }
+        }
+        player1Time = 300; // Example reset timer values
+        player2Time = 300;
+        isPlayer1Turn = true;
+        repaint();
+        startTimers();
+    }
+
+    private void backToMainMenu() {
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        topFrame.dispose();
+        HomeMenu.main(null); // Call main menu
     }
 
     private String formatTime(int seconds) {
@@ -133,6 +217,19 @@ public class LineGrinderPanel extends JPanel {
                     ImageIcon avatar = (piece == 1) ? player1Avatar : player2Avatar;
                     g2.drawImage(avatar.getImage(), (int) (col * cellSize), (int) (row * cellSize), (int) cellSize,
                             (int) cellSize, null);
+                }
+            }
+        }
+
+        // Highlight winning boxes
+        if (winningCoordinates[0][0] >= 0 && winningCoordinates[0][1] >= 0) {
+            g2.setColor(Color.RED);
+            g2.setStroke(new BasicStroke(3));
+            for (int[] coordinate : winningCoordinates) {
+                if (coordinate[0] >= 0 && coordinate[1] >= 0) {
+                    int x = (int) (coordinate[1] * cellSize);
+                    int y = (int) (coordinate[0] * cellSize);
+                    g2.drawRect(x, y, (int) cellSize, (int) cellSize);
                 }
             }
         }
