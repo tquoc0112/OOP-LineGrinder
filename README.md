@@ -13,12 +13,11 @@ Contributions:
 
 
 A special thanks to my friends for their support and contributions! 🙌
-
--Pham Thai Quoc ITITWE21118
-
--Vo Nguyen Thanh Liem ITITIU21069
-
--Nguyen Tram Gia Hung ITITIU23007
+Phạm Thái Quốc (Leader)                 ITITWE21118
+Bùi Thế Tùng                            ITITIU22243
+Võ Nguyễn Thanh Liêm                    ITITIU21069
+Phạm Nguyễn Công Danh                  	ITDSIU23035
+Nguyễn Trầm Gia Hưng                    ITITIU23007
 
 
 Works left:
