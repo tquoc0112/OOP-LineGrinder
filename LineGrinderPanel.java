@@ -7,25 +7,20 @@ import java.util.TimerTask;
 
 public class LineGrinderPanel extends JPanel {
     private int boardSize;
-    private int winningCondition; // Winning condition
+    private int winningCondition;
     private ImageIcon player1Avatar;
     private ImageIcon player2Avatar;
     private int player1Time;
     private int player2Time;
-
     private JLabel player1TimerLabel;
     private JLabel player2TimerLabel;
-
     private Timer player1Timer;
     private Timer player2Timer;
-
     private boolean isPlayer1Turn = true;
-
     private int[][] board;
-    private int[][] winningCoordinates; // To store winning line coordinates
-
-    private String player1Name; // Player 1 name
-    private String player2Name; // Player 2 name
+    private int[][] winningCoordinates;
+    private String player1Name;
+    private String player2Name;
 
     public LineGrinderPanel(int boardSize, int winningCondition, ImageIcon player1Avatar, ImageIcon player2Avatar,
             int player1Time, int player2Time, String player1Name, String player2Name) {
@@ -35,25 +30,26 @@ public class LineGrinderPanel extends JPanel {
         this.player2Avatar = player2Avatar;
         this.player1Time = player1Time;
         this.player2Time = player2Time;
-        this.player1Name = player1Name; // Set Player 1 name
-        this.player2Name = player2Name; // Set Player 2 name
-
-        this.board = new int[boardSize][boardSize]; // Initialize the board
-        this.winningCoordinates = new int[winningCondition][2]; // Adjust size based on winning condition
+        this.player1Name = player1Name;
+        this.player2Name = player2Name;
+        this.board = new int[boardSize][boardSize];
+        this.winningCoordinates = new int[winningCondition][2];
 
         setLayout(new BorderLayout());
 
-        // Left Panel for Player 1
-        JPanel player1Panel = createPlayerPanel(player1Name, player1Avatar, true);
+        // Create a side panel for player information
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Right Panel for Player 2
-        JPanel player2Panel = createPlayerPanel(player2Name, player2Avatar, false);
+        // Add player panels to the side panel
+        sidePanel.add(createPlayerPanel(player1Name, player1Avatar, true));
+        sidePanel.add(Box.createVerticalStrut(30)); // Spacer between players
+        sidePanel.add(createPlayerPanel(player2Name, player2Avatar, false));
 
-        // Add player panels
-        add(player1Panel, BorderLayout.WEST);
-        add(player2Panel, BorderLayout.EAST);
+        add(sidePanel, BorderLayout.WEST);
 
-        // Board Panel
+        // Create the board panel
         JPanel boardPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -67,28 +63,27 @@ public class LineGrinderPanel extends JPanel {
                 handleMouseClick(e.getX(), e.getY());
             }
         });
-        add(boardPanel, BorderLayout.CENTER);
 
-        // Initialize timers
+        add(boardPanel, BorderLayout.CENTER);
         startTimers();
     }
 
     private JPanel createPlayerPanel(String playerName, ImageIcon playerAvatar, boolean isPlayer1) {
         JPanel playerPanel = new JPanel();
         playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
-        playerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        playerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel nameLabel = new JLabel(playerName); // Show the actual player name
+        JLabel nameLabel = new JLabel(playerName);
         nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel avatarLabel = new JLabel();
         avatarLabel.setIcon(new ImageIcon(playerAvatar.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
-        avatarLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        avatarLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel timerLabel = new JLabel(formatTime(isPlayer1 ? player1Time : player2Time));
         timerLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        timerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         if (isPlayer1) {
             player1TimerLabel = timerLabel;
@@ -97,31 +92,28 @@ public class LineGrinderPanel extends JPanel {
         }
 
         playerPanel.add(nameLabel);
-        playerPanel.add(Box.createVerticalStrut(10)); // Spacer
+        playerPanel.add(Box.createVerticalStrut(10));
         playerPanel.add(avatarLabel);
-        playerPanel.add(Box.createVerticalStrut(10)); // Spacer
+        playerPanel.add(Box.createVerticalStrut(10));
         playerPanel.add(timerLabel);
 
         return playerPanel;
     }
 
     private void handleMouseClick(int x, int y) {
-        double cellSize = getWidth() / (double) boardSize;
-        int row = (int) (y / cellSize);
-        int col = (int) (x / cellSize);
+        int cellSize = calculateCellSize();
+        int boardStartX = (getWidth() - cellSize * boardSize) / 2;
+        int boardStartY = (getHeight() - cellSize * boardSize) / 2;
+
+        int col = (x - boardStartX) / cellSize;
+        int row = (y - boardStartY) / cellSize;
 
         if (row >= 0 && row < boardSize && col >= 0 && col < boardSize && board[row][col] == 0) {
             board[row][col] = isPlayer1Turn ? 1 : 2;
 
-            // Reset winning coordinates before checking
-            for (int i = 0; i < winningCoordinates.length; i++) {
-                winningCoordinates[i][0] = -1;
-                winningCoordinates[i][1] = -1;
-            }
-
-            // Check for a winner after placing a piece
+            // Check for a winner
             if (checkWinner(row, col)) {
-                repaint(); // Ensure all changes are visible
+                repaint();
                 Timer endGameDelay = new Timer();
                 endGameDelay.schedule(new TimerTask() {
                     @Override
@@ -129,7 +121,20 @@ public class LineGrinderPanel extends JPanel {
                         String winnerName = isPlayer1Turn ? player1Name : player2Name;
                         endGame(winnerName + " wins!");
                     }
-                }, 500); // 500ms delay to show the last move
+                }, 500);
+                return;
+            }
+
+            // Check for a draw
+            if (isBoardFull()) {
+                repaint();
+                Timer endGameDelay = new Timer();
+                endGameDelay.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        endGame("YOU ARE BOTH TIED");
+                    }
+                }, 500);
                 return;
             }
 
@@ -140,32 +145,43 @@ public class LineGrinderPanel extends JPanel {
 
     private boolean checkWinner(int row, int col) {
         int player = board[row][col];
-        return checkDirection(row, col, 1, 0, player) || // Check horizontally
-                checkDirection(row, col, 0, 1, player) || // Check vertically
-                checkDirection(row, col, 1, 1, player) || // Check diagonal down-right
-                checkDirection(row, col, 1, -1, player); // Check diagonal down-left
+        for (int[] dir : new int[][] { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, -1 } }) {
+            if (checkDirection(row, col, dir[0], dir[1], player)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean checkDirection(int row, int col, int rowDir, int colDir, int player) {
         int count = 0;
-        for (int i = -winningCondition + 1; i < winningCondition; i++) { // Check in both directions
+        for (int i = -winningCondition + 1; i < winningCondition; i++) {
             int newRow = row + i * rowDir;
             int newCol = col + i * colDir;
-            if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize
-                    && board[newRow][newCol] == player) {
-                if (count < winningCondition) {
-                    winningCoordinates[count][0] = newRow;
-                    winningCoordinates[count][1] = newCol;
-                }
+            if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize &&
+                    board[newRow][newCol] == player) {
+                winningCoordinates[count][0] = newRow;
+                winningCoordinates[count][1] = newCol;
                 count++;
                 if (count == winningCondition) {
-                    return true; // Found the required line
+                    return true;
                 }
             } else {
-                count = 0; // Reset count if the sequence breaks
+                count = 0;
             }
         }
         return false;
+    }
+
+    private boolean isBoardFull() {
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
+                if (board[row][col] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void startTimers() {
@@ -207,13 +223,14 @@ public class LineGrinderPanel extends JPanel {
                 new String[] { "Restart", "Main Menu" }, "Restart");
 
         if (choice == 0) {
-            restartGame();
+            resetBoard();
         } else {
-            backToMainMenu();
+            // Add logic to return to main menu, if applicable
+            System.exit(0);
         }
     }
 
-    private void restartGame() {
+    private void resetBoard() {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 board[i][j] = 0;
@@ -226,52 +243,51 @@ public class LineGrinderPanel extends JPanel {
         startTimers();
     }
 
-    private void backToMainMenu() {
-        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        topFrame.dispose();
-        HomeMenu.main(null); // Call main menu
-    }
-
     private String formatTime(int seconds) {
         int minutes = seconds / 60;
         int secs = seconds % 60;
         return String.format("%02d:%02d", minutes, secs);
     }
 
+    private int calculateCellSize() {
+        int availableWidth = getWidth();
+        int availableHeight = getHeight();
+        return Math.min(availableWidth, availableHeight) / boardSize;
+    }
+
     private void drawBoard(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+        int cellSize = calculateCellSize();
+        int boardStartX = (getWidth() - cellSize * boardSize) / 2;
+        int boardStartY = (getHeight() - cellSize * boardSize) / 2;
 
-        double cellSize = getWidth() / (double) boardSize;
-
-        // Draw grid
         g2.setColor(Color.BLACK);
         for (int i = 0; i <= boardSize; i++) {
-            int pos = (int) (i * cellSize);
-            g2.drawLine(0, pos, getWidth(), pos); // Horizontal lines
-            g2.drawLine(pos, 0, pos, getHeight()); // Vertical lines
+            int pos = i * cellSize;
+            g2.drawLine(boardStartX, boardStartY + pos, boardStartX + boardSize * cellSize, boardStartY + pos); // Horizontal
+            g2.drawLine(boardStartX + pos, boardStartY, boardStartX + pos, boardStartY + boardSize * cellSize); // Vertical
         }
 
-        // Draw pieces
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
                 int piece = board[row][col];
                 if (piece != 0) {
                     ImageIcon avatar = (piece == 1) ? player1Avatar : player2Avatar;
-                    g2.drawImage(avatar.getImage(), (int) (col * cellSize), (int) (row * cellSize), (int) cellSize,
-                            (int) cellSize, null);
+                    g2.drawImage(avatar.getImage(), boardStartX + col * cellSize, boardStartY + row * cellSize,
+                            cellSize, cellSize, null);
                 }
             }
         }
 
-        // Highlight winning boxes
-        if (winningCoordinates[0][0] >= 0 && winningCoordinates[0][1] >= 0) {
+        // Highlight winning line
+        if (winningCoordinates[0][0] >= 0) {
             g2.setColor(Color.RED);
             g2.setStroke(new BasicStroke(3));
             for (int[] coordinate : winningCoordinates) {
                 if (coordinate[0] >= 0 && coordinate[1] >= 0) {
-                    int x = (int) (coordinate[1] * cellSize);
-                    int y = (int) (coordinate[0] * cellSize);
-                    g2.drawRect(x, y, (int) cellSize, (int) cellSize);
+                    int x = boardStartX + coordinate[1] * cellSize;
+                    int y = boardStartY + coordinate[0] * cellSize;
+                    g2.drawRect(x, y, cellSize, cellSize);
                 }
             }
         }
