@@ -4,7 +4,7 @@ import java.awt.*;
 public class HomeMenu extends JFrame {
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Gomoku");
+        JFrame frame = new JFrame("LineGrinder");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
